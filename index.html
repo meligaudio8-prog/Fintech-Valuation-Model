@@ -270,6 +270,94 @@ tr.sub td:first-child{padding-left:22px;color:var(--ink3);font-weight:400;}
 .vr-base{background:var(--blue-lt);border:1.5px solid var(--blue);flex:1.4;display:flex;align-items:center;justify-content:center;font-size:12px;font-family:var(--mono);color:var(--blue);font-weight:700;z-index:1;}
 .vr-bull{background:var(--grn-lt);border:1px solid #a3e6c8;flex:1;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--mono);color:var(--grn);font-weight:600;border-radius:0 20px 20px 0;}
 .range-labels{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink3);font-family:var(--mono);}
+
+/* ── MOBILE RESPONSIVE ─────────────────────────────────────────── */
+@media(max-width:768px){
+
+  /* Landing */
+  .ltop{padding:16px 20px;}
+  .lmeta{display:none;}
+  .lbody{padding:40px 20px;}
+  .lh1{font-size:clamp(32px,10vw,52px);}
+  .lsub{font-size:13px;}
+  .lfoot{padding:14px 20px;flex-direction:column;gap:4px;font-size:10px;}
+  .lbrow{font-size:10px;flex-wrap:wrap;justify-content:center;gap:6px;}
+
+  /* Topbar */
+  .topbar{padding:0 12px;height:auto;min-height:54px;flex-wrap:wrap;}
+  .tbbrand{padding-right:10px;margin-right:8px;}
+  .tbbrand .tb-name{font-size:11px;}
+  .tbbrand .tb-sub{font-size:9px;}
+  .tbnav{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .tbtab{padding:0 9px;font-size:10.5px;gap:3px;}
+  .tbright{padding-left:8px;gap:4px;}
+  .tbright button{font-size:10px;padding:5px 8px;}
+
+  /* Main content */
+  .main{padding:0 14px 60px;}
+
+  /* All grid layouts → single column */
+  .g4,.g3,.g2,.g21,.g12{grid-template-columns:1fr;gap:10px;margin-bottom:12px;}
+
+  /* Cards */
+  .card{padding:14px;}
+
+  /* Impact banner (Live Output bar) */
+  .impact-banner{flex-direction:column;align-items:flex-start;padding:12px 14px;gap:8px;}
+  .impact-banner .ib-label{margin-right:0;margin-bottom:4px;}
+  .impact-items{flex-direction:column;width:100%;gap:0;}
+  .impact-item{min-width:unset;padding:8px 0;border-left:none;border-top:1px solid rgba(255,255,255,.1);}
+  .impact-item:first-child{border-top:none;}
+  .impact-banner.sticky{margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px;}
+
+  /* LBO banner */
+  .lbo-banner{grid-template-columns:1fr 1fr;padding:14px 14px;gap:12px;}
+  .lbo-banner.sticky{margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px;}
+
+  /* Section headers */
+  .sec-title{font-size:18px;}
+  .sec-sub{font-size:12px;}
+
+  /* KPI / metric displays */
+  .kv{font-size:22px;}
+  .kv-lg{font-size:26px;}
+
+  /* Sliders */
+  .range-row{flex-wrap:wrap;gap:6px;}
+  .range-row input[type=range]{min-width:0;width:100%;}
+
+  /* Tables — allow horizontal scroll */
+  table{font-size:10.5px;}
+  th,td{padding:6px 8px;}
+
+  /* Waterfall bars */
+  .wf-row{flex-wrap:wrap;gap:4px;}
+
+  /* AI panel */
+  .ai-sugs{flex-wrap:wrap;}
+  .ai-sug{font-size:10px;padding:4px 8px;}
+  .ai-input-row{flex-wrap:wrap;}
+  .ai-input-row input{min-width:0;width:100%;}
+
+  /* Modal */
+  .modal{width:92vw;padding:20px 16px;}
+
+  /* Warn boxes */
+  .warn-box{font-size:11.5px;padding:10px 12px;}
+
+  /* Valuation range bar */
+  .valuation-range{height:30px;}
+  .vr-bear,.vr-base,.vr-bull{font-size:10px;}
+
+  /* LBO toggle buttons */
+  [style*="width:fit-content"]{width:100%!important;}
+}
+
+@media(max-width:400px){
+  .lbo-banner{grid-template-columns:1fr;}
+  .impact-item .iv{font-size:20px;}
+  .tbtab{font-size:9.5px;padding:0 7px;}
+}
 </style>
 </head>
 <body>
@@ -1763,7 +1851,9 @@ function renderLboBanner(irr,moic,entryEV,exitEV,eqIn,eqOut,li){
   // Setup sticky once (sentinel only added once)
   if(!wrap._stickyDone){
     wrap._stickyDone = true;
-    wrap.style.cssText = 'position:sticky;top:54px;z-index:150;margin-left:-48px;margin-right:-48px;';
+    const isMobile = window.innerWidth <= 768;
+    const margin = isMobile ? '-14px' : '-48px';
+    wrap.style.cssText = `position:sticky;top:54px;z-index:150;margin-left:${margin};margin-right:${margin};`;
     const inner = wrap.querySelector('.lbo-banner');
     if(inner){ inner.style.borderRadius='0'; inner.style.marginBottom='0'; }
     // Sentinel to detect when wrap is above fold
@@ -1929,7 +2019,22 @@ function showTab(name){
     sentinel.style.cssText = 'height:1px;margin-bottom:-1px;pointer-events:none;';
     banner.parentNode.insertBefore(sentinel, banner);
     const obs = new IntersectionObserver(([entry])=>{
-      banner.classList.toggle('sticky', !entry.isIntersecting);
+      const isMobile = window.innerWidth <= 768;
+      const margin = isMobile ? '-14px' : '-48px';
+      const pad = isMobile ? '14px' : '48px';
+      if(!entry.isIntersecting){
+        banner.classList.add('sticky');
+        banner.style.marginLeft = margin;
+        banner.style.marginRight = margin;
+        banner.style.paddingLeft = pad;
+        banner.style.paddingRight = pad;
+      } else {
+        banner.classList.remove('sticky');
+        banner.style.marginLeft = '';
+        banner.style.marginRight = '';
+        banner.style.paddingLeft = '';
+        banner.style.paddingRight = '';
+      }
     },{rootMargin:'-54px 0px 0px 0px', threshold:0});
     obs.observe(sentinel);
   }
